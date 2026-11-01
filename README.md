@@ -32,3 +32,10 @@ The trade-off: `unix_to_atomic` always returns a list (length 1 in the normal ca
 Dates before 1972. Before 1972 the TAI–UTC relationship was rate-based, not a clean integer offset, and this library does not model it. Timestamps before the first tabulated leap second (Unix 78796800, i.e. 1972-07-01 00:00:00 UTC) are handled by assuming the initial 10-second offset applies throughout — accurate enough for post-1972 work, wrong for historical precision. If you need pre-1972 accuracy you need a different library.
 
 The leap-second table is current as of 2017-01-01 (offset 37). New leap seconds are announced by the IERS months in advance; when one is announced, add a new entry to `LEAP_SECONDS` and increment the offset by 1. The library does not fetch updates automatically — that would be a network dependency, and this library has none.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
